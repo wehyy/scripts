@@ -6,7 +6,7 @@ TCP_Total=$(ss -s | awk '$1=="TCP"{print $2}') #所有TCP连接个数
 UDP_Total=$(ss -s | awk '$1=="UDP"{print $2}') #所有UDP连接个数
 Unix_sockets_Total=$(ss -ax | awk 'BEGIN{count=0} {count++} END{print count}') #所有UNIX sockets连接个数
 TCP_Listen_Total=$(ss -antlpH | awk 'BEGIN{count=0} {count++} END{print count}') #所有处于Listen监听状态的TCP端口个数
-TCP_Estab_Total=$(ss -antph | awk 'BEGIN{count=0} /^ESTAB/{count++} END{print count}') #所有处于ESTABLISHED状态TCP连接个数
+TCP_Estab_Total=$(ss -antpH | awk 'BEGIN{count=0} /^ESTAB/{count++} END{print count}') #所有处于ESTABLISHED状态TCP连接个数
 TCP_SYN_RECV_Total=$(ss -antpH | awk 'BEGIN{count=0} /^SYN-RECV/{count++} END{print count}') #所有处于SYN_RECV状态的TCP连接个数
 TCP_TIME_WAIT_Total=$(ss -antpH | awk 'BEGIN{count=0} /^TIME-WAIT/{count++} END{print count}') #所有处于TIME-WAIT状态的TCP连接个数
 TCP_TIME_WAIT1_Total=$(ss -antpH | awk 'BEGIN{count=0} /^TIME-WAIT1/{count++} END{print count}') #所有处于TIME-WAIT1状态的TCP连接个数
@@ -39,7 +39,7 @@ tcp_listen(){
 tcp_estab(){
 	echo -n "处于ESTAB状态的TCP连接个数:"
 	$SUCCESS
-	echo "TCP_Estab_Total"
+	echo "$TCP_Estab_Total"
 	$NORMAL
 }
 
@@ -47,7 +47,7 @@ tcp_estab(){
 tcp_syn_recv(){
 	echo -n "处于SYN-RECV状态的TCP连接个数:"
 	$SUCCESS
-	echo "TCP_SYN_RECV_Total"
+	echo "$TCP_SYN_RECV_Total"
 	$NORMAL
 }
 
@@ -64,7 +64,7 @@ tcp_time_wait1(){
 	echo -n "处于TIME-WAIT1状态的TCP连接个数:"
 	$SUCCESS
 	echo "$TCP_TIME_WAIT1_Total"
-	$NoRMAL
+	$NORMAL
 }
 
 #显示处于TIME-WAIT2状态的TCP连接个数
@@ -101,7 +101,7 @@ remote_count(){
 
 #显示每个端口的并发连接数
 port_count(){
-	echo -n "每个端口的并发连接数:"
+	echo -n "每个端口的并发连接数:" -n
 	$SUCCESS
 	echo "$TCP_Port_Count"
 	$NORMAL
