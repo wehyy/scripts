@@ -95,7 +95,7 @@ unix_total(){
 remote_count(){
 	echo -n "每个远程主机与本机的并发连接数:"
 	$SUCCESS
-	echo -n "$TCP_Remote_Count"
+	echo "$TCP_Remote_Count"
 	$NORMAL
 }
 
@@ -103,7 +103,7 @@ remote_count(){
 port_count(){
 	echo -n "每个端口的并发连接数:"
 	$SUCCESS
-	echo -n "$TCP_Port_Count"
+	echo "$TCP_Port_Count"
 	$NORMAL
 }
 
