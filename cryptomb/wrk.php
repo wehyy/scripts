@@ -11,7 +11,7 @@ function testTp($con, $qps, $type) {
         $topSet = array('wrk', 'wrk-74fcc4bdf9-j2zsh -c istio-proxy', 'nginx-cryptomb-5b5d6b8d54-glxvf -c istio-proxy', 'nginx-cryptomb-5b5d6b8d54-glxvf -c nginx');
     }
 
-    $wrkFile = "./wrk-result/{$type}/wrk/latency_t1_c{$con}._R{$qps}_30s";
+    $wrkFile = "./wrk-result/{$type}/wrk/latency_t1_c{$con}_R{$qps}_30s";
     $logPath = "./wrk-result/{$type}/top/";
     $wrkCmd = sprintf($strCmd, $con, $qps);
     echo $wrkFile, ": start to exec ",$wrkCmd,"\n";
@@ -34,13 +34,13 @@ function testTp($con, $qps, $type) {
                     mkdir($logPath);
                 }
                 if ($index == 1) {
-                    $topCmd = "kubectl exec {$topSet[$index]} -- top -b -n 80 -d 0.5 | grep envoy > {$logPath}/wrk-envoy-top_C{$con}_R{$qps}.log";
+                    $topCmd = "kubectl exec {$topSet[$index]} -- top -b -n 60 -d 0.5 | grep envoy > {$logPath}/wrk-envoy-top_C{$con}_R{$qps}.log";
                 }
                 elseif ($index == 2) {
-                    $topCmd = "kubectl exec {$topSet[$index]} -- top -b -n 80 -d 0.5 | grep envoy > {$logPath}/nginx-envoy-top_C{$con}_R{$qps}.log";
+                    $topCmd = "kubectl exec {$topSet[$index]} -- top -b -n 60 -d 0.5 | grep envoy > {$logPath}/nginx-envoy-top_C{$con}_R{$qps}.log";
                 }
                 elseif ($index == 3) {
-                    $topCmd = "kubectl exec {$topSet[$index]} -- top -b -n 80 -d 0.5 | grep nginx > {$logPath}/nginx-top_C{$con}_R{$qps}.log";
+                    $topCmd = "kubectl exec {$topSet[$index]} -- top -b -n 60 -d 0.5 | grep nginx > {$logPath}/nginx-top_C{$con}_R{$qps}.log";
                 }
                 exec($topCmd);
                 exit;
@@ -63,7 +63,7 @@ foreach ($cCon as $c) {
             echo "--start benchmark: con: {$c} rps: {$r} type: {$t}--\n";
             echo "--------------------------------\n";
             testTp($c, $r, $t);
-            sleep(100);
+            sleep(40);
             echo "--------------------------------\n";
             echo "--end benchmark: con: {$c} rps: {$r} type: {$t}--\n";
             echo "--------------------------------\n";
