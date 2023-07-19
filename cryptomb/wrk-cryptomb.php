@@ -2,9 +2,7 @@
 //wrk benchmark, short connection and close reused-session
 function testTp($type) {
 
-    $wrkClient = "wrk-644cd7db75-9rrjc";
-    $nginxDefault = "nginx-77b64c49df-6mhhw";
-    $nginxCryptomb = "nginx-cryptomb-8bfcb6fc-2hs5c";
+    $wrkClient = "wrk-out-646c879bdc-ql95n";
     $wrkStr = "wrk -t4 -c60 -d60";
     $topStr = "top -b -n 100 -d 1";
     $httpUrl = "http://172.16.111.88/hello";
@@ -35,6 +33,7 @@ function testTp($type) {
         echo $wrkFile, ": start to exec ",$wrkCmd,"\n";
         $rawCmd = "{$wrkCmd} > {$wrkFile}";
         exec($rawCmd);
+        sleep(20);
     }
 }
 
@@ -45,7 +44,6 @@ foreach ($cType as $t) {
     echo "--start benchmark: type: {$t}--\n";
     echo "--------------------------------\n";
     testTp($t);
-    sleep(100);
     echo "--------------------------------\n";
     echo "--end benchmark: type: {$t}--\n";
     echo "--------------------------------\n";
