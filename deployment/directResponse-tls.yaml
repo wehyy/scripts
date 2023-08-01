@@ -1,0 +1,47 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: ingress-gtw
+  namespace: default
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: httpbin-credential
+    hosts:
+    - "*"
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: directResvs
+  namespace: default
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ingress-gtw
+  http:
+  - match:
+    - uri:
+        exact: /hello
+    directResponse:
+      status: 200
+      body:
+        string: "{\"test\": \"direct-response test\"}"
+    headers:
+      response:
+        set:
+          content-type: "application/json"

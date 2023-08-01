@@ -14,7 +14,7 @@ function testTp($type) {
     elseif ($type == "httpClose") {
         $wrkCmd = "kubectl exec -n my-env {$wrkClient} -- {$wrkStr} -H 'Connection: Close' --latency {$httpUrl}";
     }
-    elseif ($type == :"httpsKeepAlive") {
+    elseif ($type == "httpsKeepAlive") {
         $wrkCmd = "kubectl exec -n my-env {$wrkClient} -- {$wrkStr} --latency {$httpsUrl}";
     }
     elseif ($type == "httpsClose") {
