@@ -1,0 +1,26 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: installed-state
+  namespace: istio-system
+spec:
+  components:
+    ingressGateways:
+    - enabled: true
+      name: istio-ingressgateway
+      k8s:
+        # this controls the SDS service which configures ingress gateway
+        podAnnotations:
+          proxy.istio.io/config: |
+            privateKeyProvider:
+              cryptomb:
+                pollDelay: 1ms
+  values:
+    # Annotate pods with
+    #     inject.istio.io/templates: sidecar, cryptomb
+    sidecarInjectorWebhook:
+      templates:
+        cryptomb: |
+          spec:
+            containers:
+            - name: istio-proxy
