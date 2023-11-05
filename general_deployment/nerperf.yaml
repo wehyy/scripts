@@ -20,4 +20,4 @@ spec:
       containers:
       - name: netperf
         image: weny017/nerperf:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: IfNotPresentx

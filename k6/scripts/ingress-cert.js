@@ -1,0 +1,69 @@
+import http from 'k6/http';
+import { sleep } from 'k6';
+
+const CERT = `-----BEGIN CERTIFICATE-----
+MIIC3jCCAcYCAQAwDQYJKoZIhvcNAQELBQAwLTEVMBMGA1UECgwMZXhhbXBsZSBJ
+bmMuMRQwEgYDVQQDDAtleGFtcGxlLmNvbTAeFw0yMzA3MDcwNzQ3MzlaFw0yNDA3
+MDYwNzQ3MzlaMD0xHDAaBgNVBAMME2h0dHBiaW4uZXhhbXBsZS5jb20xHTAbBgNV
+BAoMFGh0dHBiaW4gb3JnYW5pemF0aW9uMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+MIIBCgKCAQEAzZ4CRK4hmdNN/Q5sj5bcMgR5hdSK9acUpeiPFmZbcpuEc3Ik8auI
+4INqNa/y/qW/0+OhgDmJ496z6gloBkn0EZHlyO5ftav+/8u0SO9Zkk3/kNiciZJd
+rdTM0z68ediaQxGlmcLnR3GAWjwdh/jbX6citw4VV4RmqGG52ejs2FxmDuR7LyHq
+mVHA7kx3UwYBU4FfYERCWg/55UHjuHm5i+3ARvO6dB4QwS29TT6JKCj7Es31UR8t
+PB8BVm5KuCdw+UtcEcaQisfetzCevvM30Kmkus3t3po+ZaMLiErm3lr03UVNK04W
+tqUwy8vLwRI0jXTWFT8XGDRGqeCngi/3DwIDAQABMA0GCSqGSIb3DQEBCwUAA4IB
+AQBEJLACQyZbXZzwrkxFcMpcvEC+tEK1nmEYYr2JbIiImr0cqq9KiVLhRPgKY0Kc
+9WQdba3GvbYw6c2xgY0cc5JAN1qwUvD5LMopctJLP/2A9gVYPubWrEi+ir10XOcW
+DFtfsOtQ/hs209N7pzWiwyUoRs647cKznsB+z2YjQQI7GRY+pddv6cWQD7SPTBhp
+tCNAFrMskA874ITlaNSGeNpHiiOSn1LUxPVWN97rhFSftZbHFJ5sUHhQi3STTqNl
+WHwd9RL5RU39f2HGnBYMSe0uRezrlpRdsCYQe6y5DKNWN1jTvp2I/tDzlyTyUx2P
+NKZYtuN5zlVvrw3Qt1DjKDVT
+-----END CERTIFICATE-----`;
+
+const KEY = `-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDNngJEriGZ0039
+DmyPltwyBHmF1Ir1pxSl6I8WZltym4RzciTxq4jgg2o1r/L+pb/T46GAOYnj3rPq
+CWgGSfQRkeXI7l+1q/7/y7RI71mSTf+Q2JyJkl2t1MzTPrx52JpDEaWZwudHcYBa
+PB2H+NtfpyK3DhVXhGaoYbnZ6OzYXGYO5HsvIeqZUcDuTHdTBgFTgV9gREJaD/nl
+QeO4ebmL7cBG87p0HhDBLb1NPokoKPsSzfVRHy08HwFWbkq4J3D5S1wRxpCKx963
+MJ6+8zfQqaS6ze3emj5lowuISubeWvTdRU0rTha2pTDLy8vBEjSNdNYVPxcYNEap
+4KeCL/cPAgMBAAECggEBALKLXlTdD/hO8A2plMMqsJIOKKf5Y6DkMJ3QT0+YGhhu
+ypikqUfhN74c3wE3g71zmBsaMobxb7cbDwdOm7G6TeFj2zCbLSjH7WmZLTeX/yN3
+70+LiII9QnNLsYBNncQAPhO3IyFdiQ8Uk+vG/62ufm+U5iQmaonQQoQ8N/HsvJ0y
+Lr/PgwlFKDf4r+WBe9/gAN1/6TqAoeWdyGSJ19AIb3MFcBF/JCvS+apwCZKzGDMR
+LX0uuxRE15yAxmhKHLgK57NJ29JBcrziakLet4lMA44FgMsPx8+yxH9ite/Syg3W
+LUMlyiHXmTh7N2VS9/tS+bMHGEACFx7/M8OBl5Cr7eECgYEA+oGL/7v1oqV29nfA
+K8K6+yyo74Ny+AijhkDZ8SO5sB+dHM2mZAiNiKIuAI/Dwi+FX2AAAJ4Y/YFqtEHi
+P/e7RbLlGfGq9TdEKdhP+AbaQ4nKiFt6A6E/aGiU0dDm2jvbAgTcwwtjui9wFMli
+9lHJsUBj/EFSOymDdF+qhAmtjvMCgYEA0iBvoK0FzaR/Ss3ZNo7/gASeEf7IISx7
+xgat0QgpiaaFfaxfXCo24Q8REL3avnNMNYSmJuzI/VJ7SHys/AFBpoYSssj5s6Al
+QpXRU9teHn/fIlgFCNmH37aqseeTSwRZklHfL5lG4/x9drJOymTjLzAzL8VgJnn4
+seN6Vv7IVnUCgYEAh+CU65YsWpidunqiBhqOCYfj6mbGibtF16B9lsrmAZ5kPide
+RYxOGPq/MRbJ/B6CnYUY+zzGGVuFYVkLO99H+TpcAoKPVIsxsfDfD43H/jJTZTsZ
+J7bjCeMQNe62CVHGLYYtqK4Y3fi1NtE1mJ4sZLSkh0N3MxgFca4ic5Q8S/kCgYBQ
+mSR4KyXYtUomNUMmDD+wqRTArkuxfdCUKqetUEYuiHMXu3Bwd7jJJvBSzaAEAVGw
+DYt1zslhcavcKAZqO0klSLQPY8tzvO/N1I2QbspxRHcgQ0bbGCVoCDb9OmhjE+4P
+k9vZ9B8fABBX4RkbxQrnZMOdhUXWPF7KTQj2KZBKqQKBgGdsBqnXegRq2OykxMzm
+oHk1PhkDdIJP2XffkWxYScgOmoaU/pUZJIGOxcTV2sv6qWt5z803IA5dA2Tqo7bO
+ITt3YlyPlgRiiVEA92hIEoqGScXm0bS0IEwtiTULhMe8+mKsQEi8yi0jKSBKIIyn
+T9xURZc2fM6eRf+Ks9TXvymm
+-----END PRIVATE KEY-----`;
+
+export const options = {
+    tlsAuth: [
+        {
+            domains: ['example.com'],
+            cert: CERT,
+            key: KEY,
+        },
+    ],
+}; 
+
+export default function () {
+    http.get('https://istio-ingressgateway.istio-system.svc.cluster.local', {
+        headers: { 
+            Host: 'httpbin.example.com' 
+          }
+    });
+    sleep(1);
+}

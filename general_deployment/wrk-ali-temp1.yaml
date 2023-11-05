@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wrk
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wrk-out
+  namespace: my-env
+spec:
+  selector:
+    matchLabels:
+      app: wrk
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wrk
+    spec:
+      containers:
+      - name: wrk
+        image: weny017/wrk
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+          requests:
+            cpu: 2000m
+            memory: 1024Mi
+        volumeMounts:
+        - name: wrk-volume
+          mountPath: /var/local/wrk
+      volumes:
+      - name: wrk-volume
+        hostPath:
+          path: /var/local/wrk
+          type: DirectoryOrCreate
+      nodeSelector:
+        node: worker1
+      restartPolicy: Always

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-dep
+  namespace: my-env
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-dep
+  template:
+    metadata:
+      labels:
+        app: grafana-dep
+    spec:
+      containers:
+      - image: grafana/grafana
+        imagePullPolicy: Always
+        #command:
+        #  - "tail"
+        #  - "-f"
+        #  - "/dev/null"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 0
+        name: grafana
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/lib/grafana"
+          name: data
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 2500Mi
+      volumes:
+      - name: data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: my-env
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 3000
+    nodePort: 30006
+  selector:
+    app: grafana-dep
